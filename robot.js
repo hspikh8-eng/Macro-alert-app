@@ -60,12 +60,15 @@ headers: {
 // Här bestämmer du vilka kolumner datan ska hamna i.
 // Måste matcha exakt vad kolumnerna heter i din Supabase-tabell!
 body: JSON.stringify({
-title: article.title,
-source: article.source.name,
-impact_score: parseInt(analysis.impactScore) || 0,
+event: analysis.event,
+impact_score: parseInt(analysis.impact_score) || 0,
+assets: Array.isArray(analysis.assets) ? analysis.assets.join(", ") : (analysis.assets || "Inga"),
+reaction: analysis.reaction,
+confidence: analysis.confidence,
+source: article.source.name || "Unknown",
 url: article.url
 })
-});
+
 
 if (dbRes.ok) {
 console.log("✅ Succé! Nyheten är analyserad och sparad i databasen.");
