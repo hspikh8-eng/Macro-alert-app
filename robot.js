@@ -37,6 +37,13 @@ messages: [
 });
 
 const aiData = await aiRes.json();
+
+console.log("AI DATA:", JSON.stringify(aiData, null, 2));
+
+if (!aiData.choices || !aiData.choices[0]) {
+throw new Error("OpenAI svarade inte korrekt");
+}
+
 const impactScore = aiData.choices[0].message.content.trim();
 console.log(`🔥 Impact Score från AI: ${impactScore}`);
 
