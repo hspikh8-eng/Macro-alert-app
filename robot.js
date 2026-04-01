@@ -62,7 +62,7 @@ headers: {
 body: JSON.stringify({
 title: article.title,
 source: article.source.name,
-impact_score: parseInt(impactScore) || 0,
+impact_score: parseInt(analysis.impactScore) || 0,
 url: article.url
 })
 });
