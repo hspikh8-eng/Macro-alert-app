@@ -2,7 +2,7 @@
 const { NEWS_API_KEY, OPENAI_API_KEY, SUPABASE_URL, SUPABASE_KEY } = process.env;
 
 // --- robot.js ---
-const SUPABASE_TABLE_NAME = "macro_alerts";
+const SUPABASE_TABLE_NAME = "alerts";
 
 async function runRobot() {
 console.log("🤖 Roboten vaknar...");
