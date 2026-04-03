@@ -30,7 +30,15 @@ headers: {
 body: JSON.stringify({
 model: "gpt-4o-mini",
 messages: [
-{ role: "system", content: "Return ONLY a number between 1-100. No text." },
+messages: [
+{
+role: "system",
+content: `Return ONLY a JSON object in this format:
+{
+"impact_score": number (1-100),
+"summary": "one short sentence explaining market impact"
+}`
+},
 { role: "user", content: article.title }
 ]
 })
@@ -44,7 +52,16 @@ if (!aiData.choices || !aiData.choices[0]) {
 throw new Error("OpenAI svarade inte korrekt");
 }
 
-const impactScore = aiData.choices[0].message.content.trim();
+const raw = aiData.choices[0].message.content;
+
+let analysis;
+
+try {
+analysis = JSON.parse(raw);
+} catch (err) {
+console.error("❌ JSON parse fail:", raw);
+return;
+}
 console.log(`🔥 Impact Score: ${impactScore}`);
 
 // 3. Spara i Supabase
@@ -59,12 +76,11 @@ headers: {
 },
 body: JSON.stringify({
 event: article.title,
-impact_score: parseInt(impactScore) || 0,
+impact_score: parseInt(analysis.impact_score) || 0,
+summary: analysis.summary || "",
 source: article.source.name || "Unknown",
-url: article.url,
-created_at: new Date().toISOString()
+url: article.url
 })
-});
 
 if (dbRes.ok) {
 console.log("✅ Sparat i databasen!");
