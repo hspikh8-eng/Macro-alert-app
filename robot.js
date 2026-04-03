@@ -1,13 +1,13 @@
 // Hämta hemliga nycklar från GitHub
 const { NEWS_API_KEY, OPENAI_API_KEY, SUPABASE_URL, SUPABASE_KEY } = process.env;
 
-// --- robot.js ---
+// --- Tabellnamn i Supabase ---
 const SUPABASE_TABLE_NAME = "alerts";
 
 async function runRobot() {
 console.log("🤖 Roboten vaknar...");
 
-// 1. Hämta en toppnyhet inom business från NewsAPI
+// 1. Hämta en toppnyhet
 const newsRes = await fetch(`https://newsapi.org/v2/top-headlines?category=business&language=en&pageSize=1&apiKey=${NEWS_API_KEY}`);
 const newsData = await newsRes.json();
 
@@ -19,8 +19,8 @@ return;
 const article = newsData.articles[0];
 console.log(`📰 Hittade nyhet: ${article.title}`);
 
-// 2. Be OpenAI analysera nyheten (Simpel test-prompt)
-console.log("🧠 Skickar till OpenAI för analys...");
+// 2. Skicka till OpenAI
+console.log("🧠 Skickar till OpenAI...");
 const aiRes = await fetch('https://api.openai.com/v1/chat/completions', {
 method: 'POST',
 headers: {
@@ -28,9 +28,9 @@ headers: {
 'Authorization': `Bearer ${OPENAI_API_KEY}`
 },
 body: JSON.stringify({
-model: "gpt-4o-mini", // Billig och snabb modell
+model: "gpt-4o-mini",
 messages: [
-{ role: "system", content: "Du är en finansiell AI. Läs rubriken. Svara ENDAST med ett nummer mellan 1-100 som visar hur mycket denna nyhet påverkar aktiemarknaden." },
+{ role: "system", content: "Return ONLY a number between 1-100. No text." },
 { role: "user", content: article.title }
 ]
 })
@@ -45,9 +45,9 @@ throw new Error("OpenAI svarade inte korrekt");
 }
 
 const impactScore = aiData.choices[0].message.content.trim();
-console.log(`🔥 Impact Score från AI: ${impactScore}`);
+console.log(`🔥 Impact Score: ${impactScore}`);
 
-// 3. Spara direkt i din Supabase-databas
+// 3. Spara i Supabase
 console.log("💾 Sparar till Supabase...");
 const dbRes = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE_NAME}`, {
 method: 'POST',
@@ -55,31 +55,21 @@ headers: {
 'apikey': SUPABASE_KEY,
 'Authorization': `Bearer ${SUPABASE_KEY}`,
 'Content-Type': 'application/json',
-'Prefer': 'return=minimal' // Behöver inget svar tillbaka
+'Prefer': 'return=minimal'
 },
-// Här bestämmer du vilka kolumner datan ska hamna i.
-// Måste matcha exakt vad kolumnerna heter i din Supabase-tabell!
 body: JSON.stringify({
-event: analysis?.event || "Unknown",
-impact_score: Number.isFinite(parseInt(analysis?.impact_score))
-? parseInt(analysis.impact_score)
-: 0,
-assets: Array.isArray(analysis?.assets)
-? analysis.assets.join(", ")
-: (analysis?.assets || "N/A"),
-reaction: analysis?.reaction || "",
-confidence: ["Low", "Medium", "High"].includes(analysis?.confidence)
-? analysis.confidence
-: "Low",
-source: article?.source?.name || "Unknown",
-url: article?.url || ""
+title: article.title,
+source: article.source.name || "Unknown",
+impact: parseInt(impactScore) || 0,
+url: article.url,
+created_at: new Date().toISOString()
 })
-
+});
 
 if (dbRes.ok) {
-console.log("✅ Succé! Nyheten är analyserad och sparad i databasen.");
+console.log("✅ Sparat i databasen!");
 } else {
-console.error("❌ Fel vid sparning till databasen:", await dbRes.text());
+console.error("❌ Fel vid Supabase:", await dbRes.text());
 }
 }
 
