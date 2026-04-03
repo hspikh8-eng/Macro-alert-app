@@ -36,8 +36,9 @@ content: `You MUST return ONLY valid JSON. No text before or after.
 
 Format:
 {
-"impact_score": number,
-"summary": "short explanation"
+  "impact_score": number,
+  "summary": "short explanation",
+  "direction": "bullish, bearish or neutral"
 }`
 },
 {
@@ -82,6 +83,7 @@ body: JSON.stringify({
 event: article.title,
 impact_score: parseInt(analysis.impact_score) || 0,
 summary: analysis.summary || "",
+direction: analysis.direction || "neutral",
 source: article.source.name || "Unknown",
 url: article.url
 })
