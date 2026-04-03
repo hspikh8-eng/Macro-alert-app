@@ -58,9 +58,9 @@ headers: {
 'Prefer': 'return=minimal'
 },
 body: JSON.stringify({
-title: article.title,
-source: article.source.name || "Unknown",
+event: article.title,
 impact_score: parseInt(impactScore) || 0,
+source: article.source.name || "Unknown",
 url: article.url,
 created_at: new Date().toISOString()
 })
