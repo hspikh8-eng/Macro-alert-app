@@ -60,13 +60,19 @@ headers: {
 // Här bestämmer du vilka kolumner datan ska hamna i.
 // Måste matcha exakt vad kolumnerna heter i din Supabase-tabell!
 body: JSON.stringify({
-event: analysis.event,
-impact_score: parseInt(analysis.impact_score) || 0,
-assets: Array.isArray(analysis.assets) ? analysis.assets.join(", ") : (analysis.assets || "Inga"),
-reaction: analysis.reaction,
-confidence: analysis.confidence,
-source: article.source.name || "Unknown",
-url: article.url
+event: analysis?.event || "Unknown",
+impact_score: Number.isFinite(parseInt(analysis?.impact_score))
+? parseInt(analysis.impact_score)
+: 0,
+assets: Array.isArray(analysis?.assets)
+? analysis.assets.join(", ")
+: (analysis?.assets || "N/A"),
+reaction: analysis?.reaction || "",
+confidence: ["Low", "Medium", "High"].includes(analysis?.confidence)
+? analysis.confidence
+: "Low",
+source: article?.source?.name || "Unknown",
+url: article?.url || ""
 })
 
 
