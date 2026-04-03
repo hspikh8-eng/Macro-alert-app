@@ -40,16 +40,10 @@ Format:
 "summary": "short explanation"
 }`
 },
-{ role: "user", content: article.title }
-]
-role: "system",
-content: `Return ONLY a JSON object in this format:
 {
-"impact_score": number (1-100),
-"summary": "one short sentence explaining market impact"
-}`
-},
-{ role: "user", content: article.title }
+role: "user",
+content: article.title
+}
 ]
 })
 });
