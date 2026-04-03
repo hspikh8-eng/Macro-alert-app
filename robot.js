@@ -30,8 +30,18 @@ headers: {
 body: JSON.stringify({
 model: "gpt-4o-mini",
 messages: [
-messages: [
 {
+role: "system",
+content: `You MUST return ONLY valid JSON. No text before or after.
+
+Format:
+{
+"impact_score": number,
+"summary": "short explanation"
+}`
+},
+{ role: "user", content: article.title }
+]
 role: "system",
 content: `Return ONLY a JSON object in this format:
 {
@@ -57,12 +67,12 @@ const raw = aiData.choices[0].message.content;
 let analysis;
 
 try {
-analysis = JSON.parse(raw);
+const cleaned = raw.replace(/```json|```/g, "").trim();
+analysis = JSON.parse(cleaned);
 } catch (err) {
 console.error("❌ JSON parse fail:", raw);
 return;
 }
-console.log(`🔥 Impact Score: ${impactScore}`);
 
 // 3. Spara i Supabase
 console.log("💾 Sparar till Supabase...");
@@ -81,6 +91,7 @@ summary: analysis.summary || "",
 source: article.source.name || "Unknown",
 url: article.url
 })
+});
 
 if (dbRes.ok) {
 console.log("✅ Sparat i databasen!");
