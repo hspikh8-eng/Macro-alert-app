@@ -60,7 +60,7 @@ headers: {
 body: JSON.stringify({
 title: article.title,
 source: article.source.name || "Unknown",
-impact: parseInt(impactScore) || 0,
+impact_score: parseInt(impactScore) || 0,
 url: article.url,
 created_at: new Date().toISOString()
 })
