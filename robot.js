@@ -51,6 +51,7 @@ Format:
 "impact_score": number,
 "summary": "short explanation",
 "direction": "bullish, bearish or neutral"
+"asset": "stocks, gold, oil, crypto or bonds"
 }`
 },
 {
@@ -101,6 +102,7 @@ event: article.title,
 impact_score: parseInt(analysis.impact_score) || 0,
 summary: analysis.summary || "",
 direction: analysis.direction || "neutral",
+asset: analysis.asset || "unknown",
 source: article.source.name || "Unknown",
 url: article.url
 })
