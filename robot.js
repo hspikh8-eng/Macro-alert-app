@@ -82,7 +82,7 @@ console.error("❌ JSON parse fail:", raw);
 return;
 }
 
-if (analysis.impact_score < 60) {
+if (analysis.impact_score < 30) {
 console.log("🚫 Ignorerar låg-impact nyhet");
 return;
 }
