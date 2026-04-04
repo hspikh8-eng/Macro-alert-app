@@ -34,11 +34,23 @@ messages: [
 role: "system",
 content: `You MUST return ONLY valid JSON. No text before or after.
 
+Only give high scores (70-100) for major macro events such as:
+- interest rate decisions
+- inflation data (CPI, PPI)
+- central bank announcements
+- war or geopolitical escalation
+- market crashes or major economic shocks
+
+Give low scores (0-40) for:
+- opinions
+- interviews (e.g. CEOs talking)
+- minor company news
+
 Format:
 {
-  "impact_score": number,
-  "summary": "short explanation",
-  "direction": "bullish, bearish or neutral"
+"impact_score": number,
+"summary": "short explanation",
+"direction": "bullish, bearish or neutral"
 }`
 },
 {
@@ -66,6 +78,11 @@ const cleaned = raw.replace(/```json|```/g, "").trim();
 analysis = JSON.parse(cleaned);
 } catch (err) {
 console.error("❌ JSON parse fail:", raw);
+return;
+}
+
+if (analysis.impact_score < 60) {
+console.log("🚫 Ignorerar låg-impact nyhet");
 return;
 }
 
